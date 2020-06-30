@@ -25,6 +25,11 @@
   command: |
     htpasswd -bBc /opt/registry/auth/htpasswd {{ mirror_registry_user }} {{ mirror_registry_password }}
 
+- name: Check if the mirror-registry container is already running
+  shell: |
+    podman ps | grep mirror-registry
+  register: check_running
+
 - name: Create mirror-registry container using podman
   shell: |
     podman run --name mirror-registry -p {{ mirror_registry_port }}:5000 \ 
@@ -38,6 +43,11 @@
       -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
       -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
       -d docker.io/library/registry:2
+  when: check_running.rc != 0
+
+- name: Restart mirror-registry container if already exists
+  shell: podman restart mirror-registry
+  when: check_running.rc == 0
 
 - name: Copy cert to add to list of trusted certs
   copy:

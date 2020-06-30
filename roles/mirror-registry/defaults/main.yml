@@ -2,6 +2,7 @@
 mirror_registry_user: user
 mirror_registry_password: password
 mirror_registry_port: 5000
+mirror_registry_validate_certs: no
 
 # cert variables
 mirror_registry_cert: 

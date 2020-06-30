@@ -1,3 +1,6 @@
 ---
 - name: Add tasks to set up a mirror registry
   include_tasks: setup.yml
+
+- name: Verify that the mirror registry was configured
+  include_tasks: verify.yml
