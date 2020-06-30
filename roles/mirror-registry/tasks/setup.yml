@@ -1,0 +1,11 @@
+---
+- name: Install required packages
+  yum:
+    name: "{{ mirror_registry_packages }}"
+    state: present
+
+- name: Create directories for registry
+  file:
+    path: "{{ item.path }}"
+    state: directory
+  loop: "{{ mirror_registry_directories | dict2items }}"
