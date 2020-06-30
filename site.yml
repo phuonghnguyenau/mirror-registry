@@ -1,0 +1,7 @@
+---
+- name: Deploy and configure a mirror registry
+  hosts: all
+  become: yes
+
+  roles:
+    - role: mirror-registry
