@@ -4,10 +4,7 @@ mirror_registry_packages:
   - httpd-tools
 
 mirror_registry_directories:
-  - name: auth_dir
-    path: /opt/registry/auth
-  - name: cert_dir
-    path: /opt/registry/certs
-  - name: data_dir
-    path: /opt/registry/data
+  auth_dir: /opt/registry/auth
+  cert_dir: /opt/registry/certs
+  data_dir: /opt/registry/data
 

@@ -6,6 +6,43 @@
 
 - name: Create directories for registry
   file:
-    path: "{{ item.path }}"
+    path: "{{ item.value }}"
     state: directory
   loop: "{{ mirror_registry_directories | dict2items }}"
+
+- name: Create cert file for registry
+  copy:
+    content: "{{ mirror_registry_cert }}"
+    dest: "{{ mirror_registry_directories.cert_dir }}/domain.crt"
+
+- name: Create key file for registry
+  copy:
+    content: "{{ mirror_registry_key }}"
+    dest: "{{ mirror_registry_directories.cert_dir }}/domain.key"
+
+
+- name: Generate username and password for registry
+  command: |
+    htpasswd -bBc /opt/registry/auth/htpasswd {{ mirror_registry_user }} {{ mirror_registry_password }}
+
+- name: Create mirror-registry container using podman
+  shell: |
+    podman run --name mirror-registry -p {{ mirror_registry_port }}:5000 \ 
+      -v {{ mirror_registry_directories.data_dir }}:/var/lib/registry:z \
+      -v {{ mirror_registry_directories.auth_dir }}:/auth:z \
+      -e "REGISTRY_AUTH=htpasswd" \
+      -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+      -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+      -v {{ mirror_registry_directories.cert_dir }}:/certs:z \
+      -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+      -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+      -e REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true \
+      -d docker.io/library/registry:2
+
+- name: Copy cert to add to list of trusted certs
+  copy:
+    content: "{{ mirror_registry_cert }}"
+    dest: "/etc/pki/ca-trust/source/anchors/domain.crt"
+
+- name: Update CA trust
+  command: /usr/bin/update-ca-trust
