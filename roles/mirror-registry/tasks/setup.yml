@@ -27,12 +27,12 @@
 
 - name: Check if the mirror-registry container is already running
   shell: |
-    podman ps | grep mirror-registry
+    {{ container_cmd }} ps | grep mirror-registry
   register: check_running
 
 - name: Create mirror-registry container using podman
   shell: |
-    podman run --name mirror-registry -p {{ mirror_registry_port }}:5000 \ 
+    {{ container_cmd }} run --name mirror-registry -p {{ mirror_registry_port }}:5000 \ 
       -v {{ mirror_registry_directories.data_dir }}:/var/lib/registry:z \
       -v {{ mirror_registry_directories.auth_dir }}:/auth:z \
       -e "REGISTRY_AUTH=htpasswd" \
@@ -46,7 +46,7 @@
   when: check_running.rc != 0
 
 - name: Restart mirror-registry container if already exists
-  shell: podman restart mirror-registry
+  shell: {{ container_cmd }} restart mirror-registry
   when: check_running.rc == 0
 
 - name: Copy cert to add to list of trusted certs

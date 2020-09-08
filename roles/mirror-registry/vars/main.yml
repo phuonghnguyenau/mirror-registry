@@ -1,6 +1,5 @@
 ---
 mirror_registry_packages:
-  - podman
   - httpd-tools
 
 mirror_registry_directories:

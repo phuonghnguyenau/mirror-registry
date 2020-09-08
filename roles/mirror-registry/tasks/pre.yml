@@ -1,0 +1,14 @@
+---
+- name: Use docker for RHEL 7
+  set_fact:
+    container_cmd: "docker"
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version == 7
+
+- name: Use podman for RHEL 8 or greater
+  set_fact:
+    container_cmd: "podman"
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version >= 8
